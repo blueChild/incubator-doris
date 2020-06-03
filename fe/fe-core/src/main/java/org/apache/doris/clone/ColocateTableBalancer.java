@@ -224,14 +224,13 @@ public class ColocateTableBalancer extends MasterDaemon {
         List<Long> tableIds = colocateIndex.getAllTableIds(groupId);
         long totalReplicaNum = 0;
         long totalReplicaSize = 0;
-        db.readLock();
-        try {
-            for (Long tblId : tableIds) {
-                OlapTable tbl = (OlapTable) db.getTable(tblId);
-                if (tbl == null) {
-                    continue;
-                }
-
+        for (Long tblId : tableIds) {
+            OlapTable tbl = (OlapTable) db.getTable(tblId);
+            if (tbl == null) {
+                continue;
+            }
+            tbl.readLock();
+            try {
                 for (Partition partition : tbl.getPartitions()) {
                     for (MaterializedIndex index : partition.getMaterializedIndices(IndexExtState.VISIBLE)) {
                         long tabletId = index.getTabletIdsInOrder().get(tabletOrderIdx);
@@ -243,10 +242,11 @@ public class ColocateTableBalancer extends MasterDaemon {
                         }
                     }
                 }
+            } finally {
+                tbl.readUnlock();
             }
-        } finally {
-            db.readUnlock();
         }
+
         LOG.debug("the number and size of replicas on backend {} of bucket {} is: {} and {}",
                 unavailableBeId, tabletOrderIdx, totalReplicaNum, totalReplicaSize);
         
