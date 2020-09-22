@@ -38,6 +38,7 @@ import org.apache.doris.catalog.RangePartitionInfo;
 import org.apache.doris.catalog.Replica;
 import org.apache.doris.catalog.ResourceMgr;
 import org.apache.doris.catalog.SparkResource;
+import org.apache.doris.catalog.Table;
 import org.apache.doris.catalog.Tablet;
 import org.apache.doris.common.AnalysisException;
 import org.apache.doris.common.DataQualityException;
@@ -380,8 +381,8 @@ public class SparkLoadJobTest {
                 AgentTaskExecutor.submit((AgentBatchTask) any);
                 Catalog.getCurrentGlobalTransactionMgr();
                 result = transactionMgr;
-//                transactionMgr.commitTransaction(dbId, transactionId, (List<TabletCommitInfo>) any,
-//                                                 (LoadJobFinalOperation) any);
+                transactionMgr.commitTransaction(dbId, (List<Table>) any, transactionId, (List<TabletCommitInfo>) any,
+                                                 (LoadJobFinalOperation) any);
             }
         };
 
