@@ -23,6 +23,7 @@ import org.apache.doris.catalog.Column;
 import org.apache.doris.catalog.Database;
 import org.apache.doris.catalog.FunctionSet;
 import org.apache.doris.catalog.OlapTable;
+import org.apache.doris.catalog.Table;
 import org.apache.doris.catalog.Table.TableType;
 import org.apache.doris.catalog.Type;
 import org.apache.doris.catalog.View;
@@ -60,6 +61,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.UUID;
 
 /**
@@ -276,14 +278,16 @@ public class SelectStmt extends QueryStmt {
     }
 
     @Override
-    public void getDbs(Analyzer analyzer, Map<String, Database> dbs) throws AnalysisException {
-        getWithClauseDbs(analyzer, dbs);
+    public void getTables(Analyzer analyzer, Map<Long, Table> tableMap) throws AnalysisException {
+        getWithClauseTables(analyzer, tableMap);
+        SortedMap<Integer, Table> sortedMap = null;
+        Lists.newArrayList(sortedMap.values());
         for (TableRef tblRef : fromClause_) {
             if (tblRef instanceof InlineViewRef) {
                 // Inline view reference
                 QueryStmt inlineStmt = ((InlineViewRef) tblRef).getViewStmt();
                 inlineStmt.withClause_ = this.withClause_;
-                inlineStmt.getDbs(analyzer, dbs);
+                inlineStmt.getTables(analyzer, tableMap);
             } else {
                 String dbName = tblRef.getName().getDb();
                 if (Strings.isNullOrEmpty(dbName)) {
@@ -294,6 +298,7 @@ public class SelectStmt extends QueryStmt {
                 if(withClause_ != null && isViewTableRef(tblRef)){
                     continue;
                 }
+                String tableName = tblRef.getName().getTbl();
                 if (Strings.isNullOrEmpty(dbName)) {
                     ErrorReport.reportAnalysisException(ErrorCode.ERR_NO_DB_ERROR);
                 }
@@ -301,6 +306,10 @@ public class SelectStmt extends QueryStmt {
                 Database db = analyzer.getCatalog().getDb(dbName);
                 if (db == null) {
                     ErrorReport.reportAnalysisException(ErrorCode.ERR_BAD_DB_ERROR, dbName);
+                }
+                Table table = db.getTable(tableName);
+                if (table == null) {
+                    ErrorReport.reportAnalysisException(ErrorCode.ERR_BAD_TABLE_ERROR, tableName);
                 }
 
                 // check auth
@@ -313,7 +322,7 @@ public class SelectStmt extends QueryStmt {
                             tblRef.getName().getTbl());
                 }
 
-                dbs.put(dbName, db);
+                tableMap.put(table.getId(), table);
             }
         }
     }

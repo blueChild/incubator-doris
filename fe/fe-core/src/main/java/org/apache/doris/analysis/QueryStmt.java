@@ -17,7 +17,7 @@
 
 package org.apache.doris.analysis;
 
-import org.apache.doris.catalog.Database;
+import org.apache.doris.catalog.Table;
 import org.apache.doris.common.AnalysisException;
 import org.apache.doris.common.ErrorCode;
 import org.apache.doris.common.ErrorReport;
@@ -427,14 +427,14 @@ public abstract class QueryStmt extends StatementBase {
         return resultExprs.get((int) pos - 1).clone();
     }
 
-    public void getWithClauseDbs(Analyzer analyzer, Map<String, Database> dbs) throws AnalysisException {
+    public void getWithClauseTables(Analyzer analyzer, Map<Long, Table> tableMap) throws AnalysisException {
         if (withClause_ != null) {
-            withClause_.getDbs(analyzer, dbs);
+            withClause_.getTables(analyzer, tableMap);
         }
     }
 
-    // get database used by this query.
-    public abstract void getDbs(Analyzer analyzer, Map<String, Database> dbs) throws AnalysisException;
+    // get tables used by this query.
+    public abstract void getTables(Analyzer analyzer, Map<Long, Table> tableMap) throws AnalysisException;
 
     /**
      * UnionStmt and SelectStmt have different implementations.

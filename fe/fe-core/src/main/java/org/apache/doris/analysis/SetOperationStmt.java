@@ -17,7 +17,7 @@
 
 package org.apache.doris.analysis;
 
-import org.apache.doris.catalog.Database;
+import org.apache.doris.catalog.Table;
 import org.apache.doris.common.AnalysisException;
 import org.apache.doris.common.UserException;
 import org.apache.doris.rewrite.ExprRewriter;
@@ -171,10 +171,10 @@ public class SetOperationStmt extends QueryStmt {
     public List<Expr> getSetOpsResultExprs() { return setOpsResultExprs_; }
 
     @Override
-    public void getDbs(Analyzer analyzer, Map<String, Database> dbs) throws AnalysisException {
-        getWithClauseDbs(analyzer, dbs);
+    public void getTables(Analyzer analyzer, Map<Long, Table> tableMap) throws AnalysisException {
+        getWithClauseTables(analyzer, tableMap);
         for (SetOperand op : operands) {
-            op.getQueryStmt().getDbs(analyzer, dbs);
+            op.getQueryStmt().getTables(analyzer, tableMap);
         }
     }
 

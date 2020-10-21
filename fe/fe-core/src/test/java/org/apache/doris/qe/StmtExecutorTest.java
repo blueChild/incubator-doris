@@ -195,7 +195,7 @@ public class StmtExecutorTest {
                 minTimes = 0;
                 result = false;
 
-                queryStmt.getDbs((Analyzer) any, (SortedMap) any);
+                queryStmt.getTables((Analyzer) any, (SortedMap) any);
                 minTimes = 0;
 
                 queryStmt.getRedirectStatus();
