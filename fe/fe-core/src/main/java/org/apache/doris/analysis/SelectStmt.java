@@ -61,7 +61,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.UUID;
 
 /**
@@ -280,8 +279,6 @@ public class SelectStmt extends QueryStmt {
     @Override
     public void getTables(Analyzer analyzer, Map<Long, Table> tableMap) throws AnalysisException {
         getWithClauseTables(analyzer, tableMap);
-        SortedMap<Integer, Table> sortedMap = null;
-        Lists.newArrayList(sortedMap.values());
         for (TableRef tblRef : fromClause_) {
             if (tblRef instanceof InlineViewRef) {
                 // Inline view reference
